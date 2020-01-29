@@ -1,5 +1,5 @@
 require "cp2112/version"
 
-module Cp2112
+module CP2112
   # Your code goes here...
 end

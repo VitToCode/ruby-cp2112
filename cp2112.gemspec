@@ -5,7 +5,7 @@ require "cp2112/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "cp2112"
-  spec.version       = Cp2112::VERSION
+  spec.version       = CP2112::VERSION
   spec.authors       = ["fenrir(M.Naruoka)"]
   spec.email         = ["fenrir.naru@gmail.com"]
 

@@ -1,6 +1,6 @@
-RSpec.describe Cp2112 do
+RSpec.describe CP2112 do
   it "has a version number" do
-    expect(Cp2112::VERSION).not_to be nil
+    expect(CP2112::VERSION).not_to be nil
   end
 
   it "does something useful" do

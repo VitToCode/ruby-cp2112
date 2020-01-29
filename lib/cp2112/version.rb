@@ -1,3 +1,3 @@
-module Cp2112
+module CP2112
   VERSION = "0.1.0"
 end
