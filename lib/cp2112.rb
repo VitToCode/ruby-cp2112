@@ -19,10 +19,15 @@ module CP2112
   @@dll_dirs ||= proc{
     root = (RUBY_PLATFORM =~ /cygwin/) ? ['/cygdrive', 'c'] : ['C:']
     [
-      ['.'], # current dir
-      root + ['SiliconLabs', 'MCU', 'CP2112_SDK', 'Library', 'Windows', 'x86'], # default install dirs
-      root + ['SiliconLabs', 'MCU', 'CP2112_SDK', 'Library', 'Windows', 'x64'],
-    ]
+      ['.'] # current dir
+    ] + $:.collect{|dir| # automatically downloaded library
+      ['x86', 'x64'].collect{|arch|
+        [dir, 'cp2112', 'silabs', 'Windows'] + [arch]
+      }
+    }.flatten(1) + ['x86', 'x64'].collect{|arch|
+      # default install dirs
+      root + ['SiliconLabs', 'MCU', 'CP2112_SDK', 'Library', 'Windows'] + [arch]
+    }
   }.call
   @@dll_setup ||= proc{|dll|
     path = File::expand_path(File::dirname(dll))

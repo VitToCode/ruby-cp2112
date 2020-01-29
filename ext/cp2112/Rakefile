@@ -1,0 +1,31 @@
+raise unless ENV["RUBYLIBDIR"]
+
+# @see https://github.com/rubygems/rubygems/blob/20f66aae16d8aaae26d9abf338dc4a0ec083b063/lib/rubygems/ext/rake_builder.rb#L29
+SILABS_LIB_DIR = File::join(ENV["RUBYLIBDIR"], 'silabs')
+
+file SILABS_LIB_DIR do
+  require 'zip'
+  require 'open-uri'
+  
+  print "Downloading Silicon Laboratories libraries ..."
+  open("https://silabs.com/documents/public/software/CP2112_Windows.exe"){|f|
+    # @see https://ja.wikipedia.org/wiki/ZIP_(%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88)
+    f.read(0x9D404) # offset appearing the first 0x504B0304
+    src = StringIO::new
+    src.write(f.read(0x33BAAC0 - 0x9D404 + 22)) # length to the last EOCD, whose signature is 0x504B0506 
+    Zip::File::open_buffer(src){|zf|
+      Zip::File::open_buffer(zf.read("InstallerData/Disk1/InstData/Resource1.zip")){|zf2|
+        Zip::File::open_buffer(zf2.read("$IA_PROJECT_DIR$/Release_zg_ia_sf.jar")){|zf3|
+          zf3.glob("CP2112_SDK/Library/*", File::FNM_DOTMATCH | File::FNM_EXTGLOB){|item|
+            zf3.extract(item, File::join(SILABS_LIB_DIR, $')) if item.name =~ /CP2112_SDK\/Library\//
+          }
+        }
+      }
+    }
+  }
+  puts " Done."
+end
+
+task :fetch_libs => [SILABS_LIB_DIR]
+
+task :default => :fetch_libs
