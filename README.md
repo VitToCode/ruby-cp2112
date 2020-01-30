@@ -1,5 +1,7 @@
 # CP2112
 
+[![Gem Version](https://badge.fury.io/rb/cp2112.svg)](https://badge.fury.io/rb/cp2112)
+
 Ruby wrapper for Silicon Laboratories CP2112 USB(HID) i2c/SMBus bridge library
 
 ## Installation
@@ -41,18 +43,20 @@ raise unless (dev.getGpioConfig == gpio_new)
 }
 
 # Read via I2C
-i2c_read = proc{|addr, size|
+i2c_read = proc{|addr, size| # addr is shifted by 1 bit (0bAAAA_AAAx, A=0/1, x=ignored)
   dev.readRequest(addr, size)
   dev.forceReadResponse(size)
-  res = dev.getReadResponse
-  res[1][0...res[2]]
+  s0, buf, buf_read = dev.getReadResponse
+  raise unless s0 == CP2112::Return_Code::HID_SMBUS_S0_COMPLETE
+  buf[0...buf_read] # return is [byte, ...]
 }
 
 # Write via I2C
-i2c_write = proc{|addr, data| # packed data is expected; data = [byte, ...].pack('C*')
-  dev.writeRequest(addr, data, data.size)
+i2c_write = proc{|addr, data| # byte array data is expected; data = [byte, ...]
+  dev.writeRequest(addr, data.pack('C*'), data.size)
   dev.transferStatusRequest
-  dev.getTransferStatusResponse
+  s0, s1 = dev.getTransferStatusResponse
+  raise unless s0 == CP2112::Return_Code::HID_SMBUS_S0_COMPLETE
 }
 
 # TODO: your i2c_read, i2c_write operation
