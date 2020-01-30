@@ -17,7 +17,7 @@ Class::new(Rake::BaseExtensionTask){
     task "compile" => ["compile:#{@name}"]
   end
 }::new("cp2112"){|ext|
-  ext.lib_dir = File::join("lib", ext.name)
+  #ext.lib_dir = File::join("lib") # default
 }
 
 task :default => :spec

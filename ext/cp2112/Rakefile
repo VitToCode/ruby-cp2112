@@ -1,7 +1,7 @@
 raise unless ENV["RUBYLIBDIR"]
 
 # @see https://github.com/rubygems/rubygems/blob/20f66aae16d8aaae26d9abf338dc4a0ec083b063/lib/rubygems/ext/rake_builder.rb#L29
-SILABS_LIB_DIR = File::join(ENV["RUBYLIBDIR"], 'silabs')
+SILABS_LIB_DIR = File::join(ENV["RUBYLIBDIR"], 'cp2112', 'silabs')
 
 file SILABS_LIB_DIR do
   require 'zip'
