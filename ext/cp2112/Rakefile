@@ -6,6 +6,7 @@ SILABS_LIB_DIR = File::join(ENV["RUBYLIBDIR"], 'cp2112', 'silabs')
 file SILABS_LIB_DIR do
   require 'zip'
   require 'open-uri'
+  require 'fileutils'
   
   print "Downloading Silicon Laboratories libraries ..."
   open("https://silabs.com/documents/public/software/CP2112_Windows.exe"){|f|
@@ -17,7 +18,10 @@ file SILABS_LIB_DIR do
       Zip::File::open_buffer(zf.read("InstallerData/Disk1/InstData/Resource1.zip")){|zf2|
         Zip::File::open_buffer(zf2.read("$IA_PROJECT_DIR$/Release_zg_ia_sf.jar")){|zf3|
           zf3.glob("CP2112_SDK/Library/*", File::FNM_DOTMATCH | File::FNM_EXTGLOB){|item|
-            zf3.extract(item, File::join(SILABS_LIB_DIR, $')) if item.name =~ /CP2112_SDK\/Library\//
+            next unless item.name =~ /CP2112_SDK\/Library\//
+            dst = File::join(SILABS_LIB_DIR, $')
+            zf3.extract(item, dst)
+            FileUtils::chmod(0755, dst) if File::ftype(dst) == "file" # executable permission is required for Fiddle::dlload
           }
         }
       }
