@@ -332,7 +332,12 @@ end
   Device.send(:define_method, :initialize, proc{|*args| @device = CP2112::open(*args)[0]})
   
   class <<self
+    def devices(vid = 0x0000, pid = 0x0000)
+      getNumDevices(vid, pid)[0]
+    end
     def [](index, vid = 0x0000, pid = 0x0000)
+      lim = devices(vid, pid)
+      raise "Incorrect index (must be < #{lim})" unless lim > index
       Device::new(index, vid, pid)
     end
   end
