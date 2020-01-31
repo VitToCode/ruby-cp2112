@@ -341,4 +341,20 @@ end
       Device::new(index, vid, pid)
     end
   end
+  
+  class Device
+    def i2c_read(addr, size) # addr is shifted by 1 bit (0bAAAA_AAAx, A=0/1, x=ignored)
+      readRequest(addr, size)
+      forceReadResponse(size)
+      s0, buf, buf_size = getReadResponse
+      raise "Read incomplete!" unless s0 == CP2112::Return_Code::HID_SMBUS_S0_COMPLETE
+      buf[0...buf_size] # return is [byte, ...]
+    end
+    def i2c_write(addr, data) # byte array data is expected; data = [byte, ...]
+      writeRequest(addr, data.pack('C*'), data.size)
+      transferStatusRequest
+      s0, s1 = getTransferStatusResponse
+      raise "Write incomplete!" unless s0 == CP2112::Return_Code::HID_SMBUS_S0_COMPLETE
+    end
+  end
 end

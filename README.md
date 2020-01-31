@@ -43,23 +43,16 @@ raise unless (dev.getGpioConfig == gpio_new)
 }
 
 # Read via I2C
-i2c_read = proc{|addr, size| # addr is shifted by 1 bit (0bAAAA_AAAx, A=0/1, x=ignored)
-  dev.readRequest(addr, size)
-  dev.forceReadResponse(size)
-  s0, buf, buf_read = dev.getReadResponse
-  raise unless s0 == CP2112::Return_Code::HID_SMBUS_S0_COMPLETE
-  buf[0...buf_read] # return is [byte, ...]
-}
+#dev.i2c_read(addr, size) # addr is shifted by 1 bit (0bAAAA_AAAx, A=0/1, x=ignored)
 
 # Write via I2C
-i2c_write = proc{|addr, data| # byte array data is expected; data = [byte, ...]
-  dev.writeRequest(addr, data.pack('C*'), data.size)
-  dev.transferStatusRequest
-  s0, s1 = dev.getTransferStatusResponse
-  raise unless s0 == CP2112::Return_Code::HID_SMBUS_S0_COMPLETE
-}
+#dev.i2c_write(addr, data) # byte array data is expected; data = [byte, ...]
 
 # TODO: your i2c_read, i2c_write operation
+
+# Other instance methods of dev is defined based on AN496
+# https://www.silabs.com/documents/public/application-notes/an496-hid-usb-to-smbus-api-specification.pdf#page=2
+# https://www.silabs.com/documents/public/application-notes/an496-hid-usb-to-smbus-api-specification.pdf#page=21
 
 dev.close
 ```
